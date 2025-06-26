@@ -1,0 +1,15 @@
+{
+  "name": "intermexv2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "esbuild scripts/main.js --bundle --minify --outfile=dist/bundle.min.js",
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "esbuild": "^0.25.5"
+  }
+}

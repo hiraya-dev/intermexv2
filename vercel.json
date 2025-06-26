@@ -1,0 +1,5 @@
+{
+    "ignoreCommand": "echo 'Handled by build script'",
+    "builds": [],
+    "outputDirectory": "dist"
+  }
