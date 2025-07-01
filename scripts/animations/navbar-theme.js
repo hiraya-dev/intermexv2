@@ -2,51 +2,43 @@
 // Navbar theme change functionality based on section scrolling
 
 export function initNavbarThemeChange() {
-    document.querySelectorAll('section[data-theme]').forEach((section) => {
-      const sectionTheme = section.getAttribute('data-theme');
-      const invertedTheme = sectionTheme === 'dark' ? 'light' : 'dark';
-    
-      ScrollTrigger.create({
-        trigger: section,
-        start: 'top top',
-        end: 'bottom top',
-        onEnter: () => {
-          document.querySelector('.navbarv2_component').setAttribute('data-theme', invertedTheme);
-        },
-        onEnterBack: () => {
-          document.querySelector('.navbarv2_component').setAttribute('data-theme', invertedTheme);
-        }
-      });
+  const navbar = document.querySelector('.navbarv2_component');
+  let currentTheme = 'light';
+
+  document.querySelectorAll('[data-theme]').forEach((el) => {
+    const elTheme = el.getAttribute('data-theme');
+    const invertedTheme = elTheme === 'dark' ? 'light' : 'dark';
+
+    ScrollTrigger.create({
+      trigger: el,
+      start: 'top top',
+      end: 'bottom top',
+      onEnter: () => {
+        navbar.setAttribute('data-theme', invertedTheme);
+        currentTheme = invertedTheme;
+      },
+      onEnterBack: () => {
+        navbar.setAttribute('data-theme', invertedTheme);
+        currentTheme = invertedTheme;
+      },
+      onLeaveBack: () => {
+        navbar.setAttribute('data-theme', 'light');
+        currentTheme = 'light';
+      }
     });
-  }
+  });
 
-// export function initNavbarThemeChange() {
-//   function updateNavbarTheme(theme) {
-//     const invertedTheme = theme === 'dark' ? 'light' : 'dark';
-//     document.querySelector('.navbarv2_component').setAttribute('data-theme', invertedTheme);
-//   }
+  gsap.matchMedia().add('(max-width: 991px)', () => {
+    const menuButton = document.querySelector('.navbarv2_menu-button');
+    if (!menuButton) return;
 
-//   function observeSection(section) {
-//     const observer = new MutationObserver(mutations => {
-//       mutations.forEach(mutation => {
-//         if (
-//           mutation.type === 'attributes' &&
-//           mutation.attributeName === 'data-theme'
-//         ) {
-//           const target = mutation.target;
-//           const theme = target.getAttribute('data-theme');
-//           if (theme) updateNavbarTheme(theme);
-//         }
-//       });
-//     });
-
-//     // Observe the section and all descendants for attribute changes
-//     observer.observe(section, {
-//       attributes: true,
-//       attributeFilter: ['data-theme'],
-//       subtree: true
-//     });
-//   }
-
-//   document.querySelectorAll('section[data-theme]').forEach(observeSection);
+    const observer = new MutationObserver(() => {
+      if (menuButton.classList.contains('w--open')) {
+        navbar.setAttribute('data-theme', 'light');
+      } else {
+        navbar.setAttribute('data-theme', currentTheme);
+      }
+    });
+    observer.observe(menuButton, { attributes: true, attributeFilter: ['class'] });
+  });
 }
