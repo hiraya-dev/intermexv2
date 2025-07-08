@@ -11,6 +11,7 @@ import { initBentoFeaturesAnimation } from './animations/bento-features.js';
 import { initBentoMarquee } from './animations/bento-marquee.js';
 import { initModalAndPrefetch } from './utils/modal-prefetch.js';
 import { initWhatsAppCountryButtons } from './utils/whatsapp-buttons.js';
+import { initHomeFeaturesSlider } from './animations/features-slider.js';
 
 // Main document ready function to initialize all components
 document.addEventListener('DOMContentLoaded', function() {
@@ -24,6 +25,6 @@ document.addEventListener('DOMContentLoaded', function() {
   initBentoMarquee();
   initModalAndPrefetch();
   initWhatsAppCountryButtons();
-  
+  initHomeFeaturesSlider();
   console.log('🚀 All modules initialized successfully');
 });
