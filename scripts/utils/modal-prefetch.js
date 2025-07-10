@@ -54,43 +54,47 @@ export function initModalAndPrefetch() {
 
   // Step 3: Handle active states and modal AJAX
   countryElements.forEach((country) => {
-    const buttonEl = country.querySelector('.home-send_country-btn');
+    const buttonEl = country.querySelectorAll('.home-send_country-btn');
 
     country.addEventListener('mouseenter', () => {
       const selectedRegion = country.getAttribute('data-region');
-    
+
       // Skip if this country is already active — avoid reset
       if (country.classList.contains('is-active')) return;
-    
+
       // Remove active states from all countries
       countryElements.forEach(c => {
         c.classList.remove('is-active');
         const title = c.querySelector('.home-send-card-title');
-        if (title) gsap.to(title, { scale: 1, duration: 0.3, ease: 'power2.out' });
+        gsap.matchMedia().add('(min-width: 992px)', () => {
+          if (title) gsap.to(title, { scale: 1, duration: 0.3, ease: 'power2.out' });
+        });
       });
-    
+
       // Remove all region block actives
       regionBlocks.forEach(block => block.classList.remove('is-active'));
-    
+
       // Activate selected country and region
       country.classList.add('is-active');
-    
+
       regionBlocks.forEach((block) => {
         const isMatch = block.getAttribute('data-region-block') === selectedRegion;
         block.classList.toggle('is-active', isMatch);
       });
-    
+
       const title = country.querySelector('.home-send-card-title');
-      if (title) gsap.to(title, { scale: 1.2, duration: 0.3, ease: 'power2.out' });
+      gsap.matchMedia().add('(min-width: 992px)', () => {
+        if (title) gsap.to(title, { scale: 1.2, duration: 0.3, ease: 'power2.out' });
+      });
     });
 
     // Load AJAX content + open modal
-    if (buttonEl) {
-      buttonEl.addEventListener('click', async (e) => {
+    buttonEl.forEach((btn) => {
+      btn.addEventListener('click', async (e) => {
         e.stopPropagation();
         if (!modal || !modalWrapper) return;
 
-        const url = buttonEl.getAttribute('data-url');
+        const url = btn.getAttribute('data-url');
         if (!url) return;
 
         // Step 4: Show modal shell and overlay loader
@@ -166,7 +170,7 @@ export function initModalAndPrefetch() {
           });
         }
       });
-    }
+    });
   });
 
   // Step 5: Modal close
