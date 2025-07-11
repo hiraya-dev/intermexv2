@@ -149,6 +149,7 @@ export function initBentoFeaturesAnimation() {
       }
     }
   
+    // Desktop animations (min-width: 992px)
     gsap.matchMedia().add("(min-width: 992px)", () => {
       // Initialize all columns
       document.querySelectorAll(".home-features_column").forEach((column) => {
@@ -161,6 +162,29 @@ export function initBentoFeaturesAnimation() {
         column.addEventListener("mouseleave", handleReset);
         // Throttle mousemove to run at most every 16ms (~60fps)
         column.addEventListener("mousemove", throttle((e) => handleColumnMove(e, column), 16));
+      });
+    });
+
+    // Tablet animations (min-width: 768px) and (max-width: 991px)
+    gsap.matchMedia().add("(min-width: 768px) and (max-width: 991px)", () => {
+      // Initialize all columns
+      document.querySelectorAll(".home-features_column").forEach((column) => {
+        animationState.initColumn(column);
+        // Cache elements for each column
+        const elements = getElements(column);
+        animationState.cacheElements(column, elements);
+        
+        // Use touch/click events for tablet
+        column.addEventListener("click", (e) => handleTabletTap(e, column));
+        
+        // Add touch feedback
+        column.addEventListener("touchstart", (e) => {
+          column.style.transform = "scale(0.98)";
+        });
+        
+        column.addEventListener("touchend", (e) => {
+          column.style.transform = "scale(1)";
+        });
       });
     });
   
@@ -190,6 +214,21 @@ export function initBentoFeaturesAnimation() {
         if (animationState.activeColumn === column && currentState === 'hovered') {
           handleReset();
         }
+      }
+    }
+
+    function handleTabletTap(e, column) {
+      // Prevent default to avoid any unwanted behavior
+      e.preventDefault();
+      
+      const currentState = animationState.getColumnState(column);
+      
+      // If this column is already active, reset all
+      if (animationState.activeColumn === column && currentState === 'hovered') {
+        handleReset();
+      } else {
+        // Otherwise, activate this column
+        handleHover(column);
       }
     }
   
@@ -313,14 +352,21 @@ export function initBentoFeaturesAnimation() {
       
       // Store timeline in state manager
       animationState.setTimeline(column, tl);
+
+      // Check if we're on tablet for different sizing
+      const isTablet = window.innerWidth >= 768 && window.innerWidth <= 991;
+      const titleSize = isTablet ? "4rem" : "5.5rem";
+      const iconScale = isTablet ? 1.2 : 1;
+      const flexGrowValue = isTablet ? 3 : 5; // Less expansion on tablet
+      const paddingValue = isTablet ? "2rem" : "4rem"; // Less padding on tablet
   
       tl.to(els.smallBentoWrapper, { height: 0, opacity: 0, duration: 0.5 })
       .to(els.bigBentoWrapper, { height: "54rem", backgroundColor: "var(--base-color-brand--light-green)", duration: 1 })
       .to(els.bigBentoContentWrapper, { opacity: 0 }, ">-0.75")
-      .to(column, { flexGrow: 5, duration: 1 }, ">-0.8")
-      .to(els.bigBentoIconOuter, { color: "var(--base-color-brand--black)" }, "<")
+      .to(column, { flexGrow: flexGrowValue, duration: 1 }, ">-0.8")
+      .to(els.bigBentoIconOuter, { color: "var(--base-color-brand--black)", scale: iconScale }, "<")
       .to(els.bigBentoIconInner, { color: "var(--base-color-brand--light-green)", stagger: 0.05 }, "<")
-      .to(els.bigBentoHeading, { color: "var(--base-color-brand--black)", fontSize: "5.5rem" }, "<")
+      .to(els.bigBentoHeading, { color: "var(--base-color-brand--black)", fontSize: titleSize }, "<")
       .to(els.bigBentoParagraphWrapper, {
         color: "var(--base-color-brand--black)",
         alignItems: "flex-start",
@@ -339,7 +385,7 @@ export function initBentoFeaturesAnimation() {
         alignItems: "flex-start",
         textAlign: "left",
         rowGap: "2rem",
-        padding: "4rem"
+        padding: paddingValue
       }, "<")
       .set(els.bigBentoContentChildren, { opacity: 0, y: 20 })
       .from(els.bigBentoContentChildren, { opacity: 0, y: 20, stagger: 0.1 }, "<")
@@ -386,7 +432,7 @@ export function initBentoFeaturesAnimation() {
         .set(els.bigBentoTextWrapper, { alignItems: "", justifyContent: "", rowGap: ""})
         .set(els.bigBentoParagraphShort, { display: "block", opacity: 1})
         .set(els.bigBentoParagraphLong, { display: "none", opacity: 0})
-        .set(els.bigBentoIconOuter, { color: "" })
+        .set(els.bigBentoIconOuter, { color: "", scale: 1 })
         .set(els.bigBentoIconInner, { color: "" })
         .to(els.bigBentoContentWrapper, { opacity: 1, y: 0 });
   
@@ -407,8 +453,12 @@ export function initBentoFeaturesAnimation() {
       
       // Store timeline in state manager
       animationState.setTimeline(column, tl);
+
+      // Check if we're on tablet for different sizing
+      const isTablet = window.innerWidth >= 768 && window.innerWidth <= 991;
+      const flexGrowValue = 0.0625; // Original collapse value for both desktop and tablet
   
-      tl.to(column, { flexGrow: 0.0625 })
+      tl.to(column, { flexGrow: flexGrowValue })
         .to(els.bigBentoWrapper, { height: "26rem" }, "<")
         .to(els.smallBentoWrapper, { height: 0, opacity: 0 }, "<")
         .to(els.bigBentoContentWrapper, { opacity: 0 }, "<");
