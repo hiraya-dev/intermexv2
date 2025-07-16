@@ -11,7 +11,7 @@ const countryData = [
       "srcCurrency": "USD",
       "dstCurrency": "MXN",
       "transactionType": 1,
-      "payerCode": "MX-0144",
+      "payerCode": "MX-0073",
       "deliveryTypeId": "D"
     },
     {
