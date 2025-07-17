@@ -149,11 +149,11 @@ const countryData = [
     const targetForm = $('#whatsapp-conversion');
     
     // Log to verify the form exists
-    console.log('Form found:', targetForm.length);
+    // console.log('Form found:', targetForm.length);
     
     // Only proceed if we find the target form
     if (targetForm.length === 0) {
-      console.log('Form whatsapp-conversion not found');
+      // console.log('Form whatsapp-conversion not found');
       return;
     }
     
@@ -166,9 +166,9 @@ const countryData = [
     const submitButton = targetForm.find('.whatsapp_submit');
     
     // Log to verify elements exist
-    console.log('Country select found:', countrySelect.length);
-    console.log('Amount input found:', amountInput.length);
-    console.log('Submit button found:', submitButton.length);
+    // console.log('Country select found:', countrySelect.length);
+    // console.log('Amount input found:', amountInput.length);
+    // console.log('Submit button found:', submitButton.length);
     
     let messagesShown = false;
     let isLoading = false;
@@ -254,7 +254,7 @@ const countryData = [
     function showTooltipError(message, targetElement) {
       // Only show tooltip for elements within our target form
       if (!targetElement.closest('#whatsapp-conversion').length) {
-        console.log('Tooltip prevented: Element not in target form');
+        // console.log('Tooltip prevented: Element not in target form');
         return;
       }
     
@@ -311,17 +311,17 @@ const countryData = [
       e.preventDefault();
       e.stopPropagation();
     
-      console.log('Submit button clicked');
+      // console.log('Submit button clicked');
     
       // Make sure we're only handling clicks on the target form
       if (!$(this).closest('#whatsapp-conversion').length) {
-        console.log('Submit prevented: Button not in target form');
+        // console.log('Submit prevented: Button not in target form');
         return true; // Allow other forms to process normally
       }
     
       // Prevent double submission
       if (messagesShown || isLoading) {
-        console.log('Submit prevented: Already processing or messages shown');
+        // console.log('Submit prevented: Already processing or messages shown');
         return false;
       }
     
@@ -329,7 +329,7 @@ const countryData = [
       const currencyCode = countrySelect.val();
       const amount = parseFloat(amountInput.val());
     
-      console.log('Currency:', currencyCode, 'Amount:', amount);
+      // console.log('Currency:', currencyCode, 'Amount:', amount);
     
       // Validation with tooltip
       if (!currencyCode) {
@@ -347,7 +347,7 @@ const countryData = [
       const selectedCountryData = countryData.find(item => item.dstCurrency === currencyCode);
     
       if (!selectedCountryData) {
-        console.error('Country data not found for currency:', currencyCode);
+        // console.error('Country data not found for currency:', currencyCode);
         setLoading(false);
         return false;
       }
@@ -365,7 +365,7 @@ const countryData = [
         deliveryTypeId: selectedCountryData.deliveryTypeId
       };
     
-      console.log('API payload:', payload);
+      // console.log('API payload:', payload);
     
       // Make API request for exchange rate calculation
       $.ajax({
@@ -374,7 +374,7 @@ const countryData = [
         contentType: 'application/json',
         data: JSON.stringify(payload),
         success: function (response) {
-          console.log('API response:', response);
+          // console.log('API response:', response);
     
           // Get the exchange rate and total from the response
           const totalReceived = response.dstAmount.toFixed(2);
@@ -403,7 +403,7 @@ const countryData = [
           setLoading(false);
         },
         error: function (error) {
-          console.error('API Error:', error);
+          // console.error('API Error:', error);
     
           // Fallback to static rates if API fails
           alert('There was an error calculating the exchange rate. Please try again later.');
@@ -514,6 +514,14 @@ const countryData = [
       return false;
     });
     
+    // Handle Enter key press on amount input
+    amountInput.on('keypress', function (e) {
+      if (e.which === 13) { // Enter key
+        e.preventDefault();
+        submitButton.trigger('click');
+      }
+    });
+    
     // Clear tooltip when user starts to fix the issue
     amountInput.on('focus input', function () {
       if ($(this).closest('#whatsapp-conversion').length) {
@@ -529,5 +537,44 @@ const countryData = [
           $(this).remove();
         });
       }
+    });
+    
+    // Add click handler for new chat button
+    $(document).on('click', '.whatsapp-arrow_icon', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Reset form values
+      countrySelect.val('');
+      amountInput.val('');
+      
+      // Reset state variables
+      messagesShown = false;
+      isLoading = false;
+      
+      // Remove any dynamic message bubbles
+      $('#interfaceChatBox .whatsapp-message-bubble_component.is-sender, #interfaceChatBox .whatsapp-message-bubble_component.is-response, #interfaceChatBox .whatsapp-message-bubble_component.is-final')
+        .fadeOut(300, function() {
+          $(this).remove();
+        });
+      
+      // Remove any validation tooltips
+      $('.validation-tooltip[data-form="whatsapp-conversion"]').fadeOut(200, function() {
+        $(this).remove();
+      });
+      
+      // Reset button state
+      submitButton.removeClass('processing');
+      
+      // Show form inputs and hide CTA link
+      $('#fieldInputs').fadeIn(250);
+      $('#ctaLink').fadeOut(250, function() {
+        $(this).css('display', 'none');
+      });
+      
+            // Update WhatsApp URL with default values
+      updateWhatsAppUrl();
+    
+      // console.log('Form reset - new chat started');
     });
   }
